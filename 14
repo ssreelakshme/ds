@@ -1,0 +1,187 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node
+{
+    int info;
+    struct node *left;
+    struct node *right;
+};
+
+typedef struct node *NODEPTR;
+NODEPTR list=NULL;
+
+NODEPTR getnode()
+{
+	NODEPTR r;
+	r=(NODEPTR)malloc(sizeof(struct node));
+	if(r==NULL)
+	{
+		printf("\nNode allocation failed");
+		exit(0);
+	}
+	return(r);
+}
+
+void display()
+{
+	NODEPTR p;
+	p=list;
+	if(p==NULL)
+		printf("\nEmpty list");
+	else
+	{
+		printf("\nThe linked list contains: ");
+		for(p=list;p!=NULL;p=p->right) 
+		{
+			printf("%d<->",p->info);
+		}
+	}
+}
+
+void createlist()
+{
+	int item;
+	char choice='y';
+	NODEPTR p;
+	list=NULL;
+
+	do
+	{
+		printf("Enter the item to be inserted:");
+		scanf("%d",&item);
+		p=getnode();
+		p->info=item;
+		p->left=NULL;
+		p->right=NULL;
+		if(list==NULL)
+		{
+			list=p;
+		}
+		else
+		{
+			p->right=list;
+			list->left=p;
+			list=p;
+		}
+		printf("Do you want to insert another item[Y/N]:");
+		scanf(" %c",&choice);
+	}while(choice=='y' || choice=='Y');
+}
+
+void insertleft(int item,int key)
+{
+	NODEPTR p,q,r;
+	p=getnode();
+	p->info=item;
+	p->right=NULL;
+	p->left=NULL;
+
+	for(q=list;q!=NULL && q->info!=key;q=q->right)
+		;
+	
+	if(q==NULL)
+	{
+		printf("key value %d not found in the list\n Insertion cannot be done",key);
+		return;
+	}
+
+	else if(q->left==NULL)
+	{
+		q->left=p;
+		p->right=q;
+		list=p;
+	}
+	else
+	{
+		r=q->left;
+		r->right=p;
+		p->left=r;
+		p->right=q;
+		q->left=p;
+	}
+}
+  
+void deletenode(int x)
+{
+	NODEPTR p,q,r;
+	if(list==NULL)
+	{
+		printf("\nEmpty List");
+		return;
+	}
+	for(p=list;p!=NULL && p->info!=x;p=p->right)
+			;
+
+	if(p==NULL)
+	{
+		printf("Node with value %d is not existing in the list\n",x);
+	}
+	else if(p->left==NULL)
+	{
+		x=p->info;
+		if(p->right==NULL)
+			list=NULL;
+		else
+			list=p->right;
+		free(p);
+		printf("Node with value %d is deleted",x);
+	}
+	else if(p->right==NULL)
+	{
+		x=p->info;
+		r=p->left;
+		r->right=NULL;
+		free(p);
+		printf("Node with value %d is deleted",x);
+	}
+	else
+	{
+		q=p->left;
+		r=p->right;
+		x=p->info;
+		q->right=r;
+		r->left=q;
+		printf("Node with value %d is deleted",x);
+		free(p);
+	}
+}
+
+int main()
+{
+	int item,choice,x,key;
+	do
+	{
+		printf("\n______________________MENU________________________");
+		printf("\n1->CREATE LIST  2->INSERT LEFT  3->DELETE  4->EXIT");
+		printf("\nEnter your choice");
+		scanf("%d",&choice);
+		switch(choice)
+		{
+		    case 1: createlist();
+				    display();
+				    break;
+				
+		    case 2: printf("\nEnter the item to be inserted:");
+				    scanf("%d",&item);
+				    printf("\nEnter key value of the node where insertion is to be done:");
+				    scanf("%d",&key);
+				    insertleft(item,key);
+				    display();
+				    break;
+				
+		    case 3: printf("Enter the item to be deleted:");
+				    scanf("%d",&x);
+			        deletenode(x);
+				    display();
+				    break;
+				
+		    case 4: printf("\n Quitting operation List.....\n");
+				    break;
+				
+		    default:printf("\n Invalid choice");
+				    break;
+		}		
+	}while(choice!=4);
+	return 0;
+}
